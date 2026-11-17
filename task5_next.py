@@ -1,27 +1,3 @@
-"""
-Task 5 - which of (item1, item2) is the user's NEXT interaction?  (CSE 158 Assignment 1)
-
-Test file: one row per user; the positive is the user's next (final) interaction after the whole
-training timeline; the negative is popularity-sampled (item of a random interaction).
-
-Training examples
-  * task 5 itself: positive = each user's last training interaction, history = everything before it
-  * tasks 1-2 / 3-4 training files (other users, full timelines): positive = the user's true FINAL
-    interaction - the same kind of event the test asks about (helped ~1pp on held-out final reads)
-  Features are always computed inside each file (item ids are hashed differently per file).
-
-Features per (user, candidate)
-  * item/user co-occurrence (several normalisations), PureSVD, BPR k=64 / k=128 (popularity negatives)
-  * order: transition probabilities from the user's last 1-10 items (gap 1 and gap <= 3), reverse
-    transitions, co-occurrence with the 1 / 3 / 10 most recent items
-  * time: where the user's last timestamp falls in the candidate's reading history, reads within
-    +-7/30/365 days of it; global recency (reads in the last 90/365/730 days of the data)
-  * how often the candidate appears among all candidates of the batch (test file / simulated set)
-  * in-history flag (a candidate already in the history is the negative)
-Model: pairwise HistGradientBoostingClassifier on [f(c1), f(c2), f(c1)-f(c2)], 3 seeds.
-
-Usage: python task5_next.py   (prints local accuracy on held-out task-5 users, writes predictions)
-"""
 import time
 from pathlib import Path
 import numpy as np, pandas as pd, scipy.sparse as sp
