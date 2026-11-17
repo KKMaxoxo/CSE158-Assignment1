@@ -1,34 +1,4 @@
-"""
-Task 4 - which of (item1, item2) did the user interact with at the given time? (CSE 158 Assignment 1)
-Task 2 pipeline + features that use the query timestamp.
 
-Test-file checks (tasks_3_4_train): negatives are items of random training interactions (popularity
-matched, NOT time matched): ~25% of negatives are books nobody had read yet at the query time vs ~1%
-of positives, and ~5% of negatives are already in the user's history (positives: 0%).
-
-Key facts about the test file (checked against the training data):
-  * The negative is popularity-sampled: item1/item2 have identical popularity distributions,
-    so popularity is useless and local validation must sample negatives the same way
-    (negative = item of a random training interaction, user history NOT excluded).
-  * ~1.9% of rows have one candidate already in the user's training history. Positives were held
-    out of training and there are no duplicate pairs, so that candidate is the negative.
-
-Pipeline
-  1. Simulate the test: hold out N_SIM random interactions as positives, pair each with a
-     popularity-sampled negative. History = the remaining interactions.
-  2. Per (user, candidate) features from the history:
-       - item-side co-occurrence: sum / max / top-10 of N_jk / (cnt_j^a cnt_k^b), several (a,b)
-       - user-side co-occurrence: same over the users of the candidate
-       - PureSVD scores (k=32, 128) on popularity-normalised matrix
-       - BPR (k=64, k=128) trained with popularity-sampled negatives
-       - temporal compatibility of user activity window vs item activity window
-       - in-history flag, log popularity, log history length
-  3. Pairwise HistGradientBoostingClassifier on [f(c1), f(c2), f(c1)-f(c2)], random slot order.
-  4. Test: rebuild the same features from ALL training interactions, predict, write the more
-     likely item.
-
-Usage:  python task4_pairwise.py     (prints local holdout accuracy, then writes predictions)
-"""
 import time
 from pathlib import Path
 import numpy as np, pandas as pd, scipy.sparse as sp
