@@ -1,31 +1,4 @@
-"""
-Task 3 - rating prediction with timestamps (CSE 158 Assignment 1), v2.
 
-What changed vs v1 (grade 0.6857):
-  * K-fold out-of-fold stacker rows. v1 built stacker features from a base history missing ~19% of the
-    data and then applied the stacker to test features built from 100% of the data, so every count /
-    similarity-mass feature (and the MF it leans on) had a different scale at test time. Now the stacker
-    rows are split into K folds and each fold's features use history = everything except that fold
-    (~(1-1/K) of the data), so train/test feature distributions match and the stacker gets more rows.
-  * Time-aware SVD++ (full-batch Adam): user / item biases, item time-bin bias, user drift, user-day bias,
-    implicit feedback from every known (user, item) pair incl. zeros and test pairs.
-  * Time-weighted co-occurrence kNN: neighbour weights = co-occurrence cosine x exp time decay, so items
-    the user rated close in time to the query count more (series / reading sessions); sharper alpha=8.
-  * Activity counts from all known pairs (train + test timestamps), e.g. user interactions that day.
-  * Validation is honest: validation features are built from full history (train minus the holdout),
-    exactly like test features. (v1's --validate built them from the partial base history.)
-Local honest validation (20k non-zero holdout, 1 GBM seed):
-  v1 protocol 0.6530 | + OOF stacker (600k rows, 6 folds) 0.6477 | + new features 0.6441
-  (600k -> 300k rows costs ~0.004, so the default now uses every non-zero row out-of-fold.)
-Runtime: ~1-1.5 h on 2 cores (6 fold builds of ~4-7 min each, then 3 GBM seeds); ~3 GB RAM.
-Set T3_CACHE=<dir> to cache feature blocks between runs.
-Zeros: the hidden test contains zero-rated rows but they are evidently not scored (scoring them as 0 would
-give ~0.91 for v1), so targets are rating > 0 only; zeros still feed similarity / zero-rate / timeline feats.
-
-Usage
-  python task3_stack.py --validate   # honest local MSE on a 20k random non-zero holdout
-  python task3_stack.py              # writes task_3_predictions.csv
-"""
 import sys, time, os
 from pathlib import Path
 import numpy as np, pandas as pd, scipy.sparse as sp
