@@ -1,25 +1,4 @@
-"""
-CSE 158 Assignment 1 - Task 1: rating prediction.
 
-Approach
-  * The hidden test set has no 0 ratings, so models are fitted on rating > 0 only.
-    Rating-0 rows ("read, not rated") still feed co-occurrence similarities and zero-rate features.
-  * Base models / features for a pair (u, i), computed from a history of interactions:
-      - bias model mu + b_u + b_i and biased MF (k=10), both fitted by ALS
-      - residual-cosine item-kNN and user-kNN (shrunk)
-      - co-occurrence kNN: neighbours ranked by binary cosine over all interactions; weighted
-        averages of their raw ratings and bias residuals
-      - user / item statistics: counts, mean, std, share of each star, zero rate, ...
-  * Stacking: a 20k holdout of rated rows is set aside, the remaining rows are split into 5 folds
-    and every rated row gets out-of-fold features; the holdout rows are added back with features
-    built from all non-holdout rows. Test features use the full training history.
-  * Stacker: average of a gradient-boosted regressor and a gradient-boosted 5-class classifier
-    (its expected rating), clipped to [1, 5].
-
-Usage
-  python task1_stack.py              # writes task_1_predictions.csv  (~60 min)
-  python task1_stack.py --validate   # also prints the holdout MSE (~0.527; one extra stacker fit)
-"""
 import sys
 import time
 from pathlib import Path
