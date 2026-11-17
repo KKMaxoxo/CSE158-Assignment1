@@ -1,30 +1,4 @@
-"""
-Task 6 - predict the time until the user's next interaction (CSE 158 Assignment 1).
 
-Test rows: one per user, (user, item of the NEXT interaction); that item is never in the user's
-training history, so delta = t_next - t_last_train.
-
-Training examples: hold out a user's k-th last interaction and predict the gap into it from everything
-before. 'back' = how many steps before the user's TRUE final interaction that gap is. Task 6 train lacks
-each user's final interaction (that is the test), so its examples have back = 1..5. The task 1-2 and 3-4
-training files hold complete timelines of other users (different users, separately hashed items), so
-they provide real FINAL gaps (back = 0), which is what the test asks for. Final gaps differ from earlier
-ones (they cluster just before the crawl date), and adding them cut MAE on held-out real final gaps
-by ~3% vs. task-6-only + rescaling. Targets are modelled as log1p(delta seconds) with
-absolute loss, i.e. the conditional median -> optimal for absolute error in seconds or in log time.
-
-Features
-  user timeline : count, span, time since first, log gaps (last 1/2/3/5, mean, median, std, quantiles,
-                  exp-weighted), activity in the last day/week/month, rating & zero of last items
-  calendar      : last timestamp, log(time from last to end of data)
-  next item     : popularity, first / 5% / median appearance time relative to the user's last time,
-                  share of the item's interactions after the user's last time, item's typical
-                  gap-before value from other users, co-occurrence of the next item with the user's
-                  recent items (series / binge signal)
-Model: HistGradientBoostingRegressor(loss='absolute_error') on log1p(delta), 3 seeds.
-
-Usage:  python task6_delta.py      (prints local validation, then writes task_6_predictions.csv)
-"""
 from pathlib import Path
 import numpy as np, pandas as pd, scipy.sparse as sp
 from sklearn.ensemble import HistGradientBoostingRegressor
