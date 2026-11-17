@@ -1,22 +1,4 @@
-"""CSE 158 Task 2 v2 — single-file feature generation, validation, and predictions.
 
-Combines the uploaded t2.py, newfeats.py, tfeats.py, t2feats.py, gapfeats.py,
-ppmi.py, base.py, allfeats.py and final.py without requiring those modules.
-
-Run:
-    python task2_v2_onefile.py
-    python task2_v2_onefile.py --eval       # extra held-out split-6 evaluation
-    python task2_v2_onefile.py --rebuild    # ignore and overwrite saved feature caches
-
-Input files in DATA:
-    tasks_1_2_train.csv, task_2_test.csv
-
-Output in DATA:
-    task_2_predictions_v2.csv
-
-Important: Complete feature generation is computationally expensive (especially
-six additional simulations, iALS, and PPMI). Completed feature sets are cached.
-"""
 import os
 import argparse
 import time
